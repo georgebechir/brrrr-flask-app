@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Saved Properties</title>
+    <style>
+        body { font-family: sans-serif; margin: 40px; background-color: #f4f4f4; color: #333; }
+        h2 { color: #2c3e50; }
+        .container { background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); max-width: 700px; margin: 20px auto; }
+        ul { list-style-type: none; padding: 0; }
+        li {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        li strong { color: #34495e; font-size: 1.1em; }
+        li div { display: flex; gap: 10px; } /* Space out links */
+        li a { text-decoration: none; padding: 5px 10px; border-radius: 4px; font-weight: bold; }
+        li a:hover { text-decoration: underline; }
+        .load-link { background-color: #3498db; color: white; }
+        .load-link:hover { background-color: #2980b9; }
+        .delete-link { background-color: #e74c3c; color: white; }
+        .delete-link:hover { background-color: #c0392b; }
+        .no-properties { text-align: center; margin-top: 20px; color: #777; }
+        .message {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            text-align: center;
+        }
+        .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error-message { color: #e74c3c; font-weight: bold; text-align: center; margin-bottom: 20px; }
+        .back-link { display: block; text-align: center; margin-top: 25px; }
+        .back-link a { text-decoration: none; color: #3498db; font-weight: bold; }
+        .back-link a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Your Saved Properties</h2>
+        {% if message %}
+            <p class="message success">{{ message }}</p>
+        {% elif error %}
+            <p class="message error-message">{{ error }}</p>
+        {% endif %}
+
+        {% if properties %}
+            <ul>
+                {% for prop in properties %}
+                    <li>
+                        <strong>{{ prop['property_address'] }}</strong>
+                        <div>
+                            <a href="{{ url_for('brrrr_bp.brrrr_calculator_page', property_id=prop['id']) }}" class="load-link">Load/Edit</a>
+                            <a href="{{ url_for('properties_bp.delete_property', property_id=prop['id']) }}" class="delete-link" onclick="return confirm('Are you sure you want to delete {{ prop[\'property_address\'] }}?');">Delete</a>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="no-properties">No properties saved yet.</p>
+        {% endif %}
+        <p class="back-link"><a href="{{ url_for('index') }}">Back to Main Menu</a></p>
+    </div>
+</body>
+</html>

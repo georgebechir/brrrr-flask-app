@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Real Estate Tools</title>
+    <style>
+        body { font-family: sans-serif; margin: 40px; background-color: #f4f4f4; color: #333; }
+        h1 { color: #2c3e50; }
+        ul { list-style-type: none; padding: 0; }
+        li { margin-bottom: 10px; }
+        a { text-decoration: none; color: #3498db; font-weight: bold; }
+        a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <h1>Welcome to Your Real Estate Tools</h1>
+    <p>Choose an option below:</p>
+    <ul>
+        <li><a href="{{ url_for('rent_bp.rent_estimate_page') }}">Fair Market Rent Lookup (by Address or ZIP)</a></li>
+        <li><a href="{{ url_for('brrrr_bp.brrrr_calculator_page') }}">BRRRR Investment Calculator (Full)</a></li>
+        <li><a href="{{ url_for('brrrr_bp.brrrr_calculator_quick_page') }}">BRRRR Investment Calculator (Quick Defaults)</a></li>
+        <li><a href="{{ url_for('properties_bp.list_properties') }}">View/Manage Saved Properties</a></li>
+    </ul>
+</body>
+</html>
