@@ -22,7 +22,7 @@ def calculate_monthly_payment(principal, annual_interest_rate, loan_term_years):
 # --- Core BRRRR Calculation Logic ---
 def perform_brrrr_calculations(form_inputs):
     error = None
-    
+
     calculated_outputs = {
         'total_initial_investment': 0.0, 'hard_money_loan_amount': 0.0, 'monthly_interest_only_hm': 0.0,
         'holding_costs_rehab': 0.0, 'total_out_of_pocket': 0.0, 'refinance_loan_amount': 0.0,
@@ -40,7 +40,7 @@ def perform_brrrr_calculations(form_inputs):
         rehab_cost = float(form_inputs.get("rehab_cost", 0.0))
         closing_costs_1 = float(form_inputs.get("closing_costs_1", 0.0))
         arv = float(form_inputs.get("arv", 0.0))
-        
+
         down_payment_1_pct = float(form_inputs.get("down_payment_1_pct", 0.0))
         interest_rate_1 = float(form_inputs.get("interest_rate_1", 0.0))
         rehab_period_months = int(form_inputs.get("rehab_period_months", 0))
@@ -207,7 +207,7 @@ def brrrr_calculator_page():
                     set_clause = ", ".join(set_clause_parts)
                     update_values = values_tuple[1:] + (property_address,)
                     cursor.execute(f"""
-                        UPDATE properties SET {set_clause}, saved_at = CURRENT_TIMESTAMP
+                       UPDATE properties SET {set_clause}, saved_at = CURRENT_TIMESTAMP
                         WHERE property_address = %s
                     """, update_values)
                     message = f"Property '{property_address}' updated successfully!"
@@ -236,7 +236,6 @@ def brrrr_calculator_page():
             page_title="BRRRR Investment Calculator (Full)",
             error=error,
             message=message,
-            results_calculated=results_calculated,
             hide_default_inputs=False,
             **form_data_for_template,
             **calculated_outputs
@@ -247,7 +246,6 @@ def brrrr_calculator_page():
         page_title="BRRRR Investment Calculator (Full)",
         error=error,
         message=message,
-        results_calculated=results_calculated,
         hide_default_inputs=False,
         **form_data_for_template,
         **calculated_outputs
