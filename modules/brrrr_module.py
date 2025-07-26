@@ -15,7 +15,8 @@ def calculate_monthly_payment(principal, annual_interest_rate, loan_term_years):
     if monthly_interest_rate == 0:
         return principal / number_of_payments
     else:
-        monthly_payment = principal * (monthly_interest_rate * (1 + monthly_interest_rate)**number_of_payments) /                           ((1 + monthly_interest_rate)**number_of_payments - 1)
+        monthly_payment = principal * (monthly_interest_rate * (1 + monthly_interest_rate)**number_of_payments) / \
+                          ((1 + monthly_interest_rate)**number_of_payments - 1)
         return monthly_payment
 
 # --- Core BRRRR Calculation Logic ---
@@ -66,7 +67,9 @@ def perform_brrrr_calculations(form_inputs):
         monthly_interest_only_hm = (hard_money_loan_amount * (interest_rate_1 / 100)) / 12
         monthly_property_tax_actual = property_tax / 12
         monthly_insurance_actual = insurance / 12
-        holding_costs_rehab = (monthly_interest_only_hm * rehab_period_months) +                               (monthly_property_tax_actual * rehab_period_months) +                               (monthly_insurance_actual * rehab_period_months)
+        holding_costs_rehab = (monthly_interest_only_hm * rehab_period_months) + \
+                              (monthly_property_tax_actual * rehab_period_months) + \
+                              (monthly_insurance_actual * rehab_period_months)
 
         refinance_loan_amount = arv * refinance_decimal
 
@@ -80,7 +83,8 @@ def perform_brrrr_calculations(form_inputs):
         monthly_property_management = rent_estimate * prop_management_decimal
         monthly_maintenance = rent_estimate * maintenance_decimal
         monthly_vacancy = rent_estimate * vacancy_decimal
-        monthly_operating_expenses = monthly_property_management + monthly_maintenance +                                      monthly_vacancy + monthly_property_tax_actual + monthly_insurance_actual
+        monthly_operating_expenses = monthly_property_management + monthly_maintenance + \
+                                     monthly_vacancy + monthly_property_tax_actual + monthly_insurance_actual
         monthly_cash_flow = rent_estimate - monthly_operating_expenses - monthly_mortgage_refi
         annual_cash_flow = monthly_cash_flow * 12
 
@@ -105,7 +109,7 @@ def perform_brrrr_calculations(form_inputs):
             'monthly_operating_expenses': monthly_operating_expenses,
             'monthly_cash_flow': monthly_cash_flow,
             'annual_cash_flow': annual_cash_flow,
-            'cash_on_cash_return': cash_on_cash_return, # CORRECTED LINE HERE
+            'cash_on_cash_return': cash_on_cash_return,
             'results_calculated': True 
         })
 
@@ -118,7 +122,7 @@ def perform_brrrr_calculations(form_inputs):
 
     return calculated_outputs, error
 
-@brrrr_bp.route("/brrrr_calculator", methods=["GET", "POST"])
+@brrrr_bp.route("/brrrr_calculator", methods=["GET", "POST"], endpoint="brrrr_calculator_full_page")
 def brrrr_calculator_page():
     error = None
     message = None
@@ -216,6 +220,125 @@ def brrrr_calculator_page():
                     """, values_tuple)
                     message = f"Property '{property_address}' saved successfully!"
                     db.commit()
+
+            except ValueError as ve:
+                error = f"Error saving: Invalid numeric input. {ve}"
+            except Exception as e:
+                db.rollback()
+                error = f"Database error while saving: {e}"
+            finally:
+                cursor.close()
+                # db.close() # Teardown context handles this
+
+    for key, value in default_inputs.items():
+        if not isinstance(value, str) and value is not None:
+            default_inputs[key] = str(value)
+
+    return render_template(
+        'brrrr_calculator.html',
+        page_title="BRRRR Investment Calculator (Quick Defaults)",
+        error=error,
+        message=message,
+        results_calculated=results_calculated,
+        hide_default_inputs=True,
+        **default_inputs,
+        **calculated_outputs
+    )
+
+@brrrr_bp.route("/brrrr_calculator_quick", methods=["GET", "POST"], endpoint="brrrr_calculator_quick_page")
+def brrrr_calculator_quick_page():
+    error = None
+    message = None
+    results_calculated = False 
+
+    default_inputs = {
+        "property_address": "",
+        "purchase_price": "",
+        "rehab_cost": "",
+        "closing_costs_1": 10000.00,
+        "arv": "",
+        "down_payment_1_pct": 10.0,
+        "interest_rate_1": 12.0,
+        "rehab_period_months": "",
+        "refinance_pct": 75.0,
+        "interest_rate_2": 7.0,
+        "loan_term_years": 30,
+        "closing_costs_2": 10.00,
+        "rent_estimate": "",
+        "property_tax": "",
+        "insurance": 1800.00,
+        "property_management_pct": 0.0,
+        "maintenance_pct": 0.0,
+        "vacancy_pct": 0.0,
+    }
+    calculated_outputs = {} 
+
+    if request.method == "POST":
+        action = request.form.get('action')
+        form_inputs = dict(request.form)
+
+        calculated_outputs, calc_error = perform_brrrr_calculations(form_inputs)
+        error = calc_error
+
+        default_inputs.update(form_inputs)
+
+        results_calculated = calculated_outputs.get('results_calculated', False)
+
+        if not error and action == 'save':
+            db = get_db()
+            cursor = db.cursor()
+            try:
+                property_address = form_inputs.get("property_address")
+                if not property_address:
+                    raise ValueError("Cannot save property: Address/Name is required.")
+
+                cursor.execute("SELECT id FROM properties WHERE property_address = %s", (property_address,))
+                existing_property = cursor.fetchone()
+
+                columns = """
+                    property_address, purchase_price, rehab_cost, closing_costs_1, arv,
+                    down_payment_1_pct, interest_rate_1, rehab_period_months,
+                    refinance_pct, interest_rate_2, loan_term_years, closing_costs_2,
+                    rent_estimate, property_tax, insurance, property_management_pct,
+                    maintenance_pct, vacancy_pct
+                """
+                values_tuple = (
+                    property_address,
+                    float(form_inputs.get('purchase_price', 0.0)),
+                    float(form_inputs.get('rehab_cost', 0.0)),
+                    float(form_inputs.get('closing_costs_1', 0.0)),
+                    float(form_inputs.get('arv', 0.0)),
+                    float(form_inputs.get('down_payment_1_pct', 0.0)),
+                    float(form_inputs.get('interest_rate_1', 0.0)),
+                    int(form_inputs.get('rehab_period_months', 0)),
+                    float(form_inputs.get('refinance_pct', 0.0)),
+                    float(form_inputs.get('interest_rate_2', 0.0)),
+                    int(form_inputs.get('loan_term_years', 0)),
+                    float(form_inputs.get('closing_costs_2', 0.0)),
+                    float(form_inputs.get('rent_estimate', 0.0)),
+                    float(form_inputs.get('property_tax', 0.0)),
+                    float(form_inputs.get('insurance', 0.0)),
+                    float(form_inputs.get('property_management_pct', 0.0)),
+                    float(form_inputs.get('maintenance_pct', 0.0)),
+                    float(form_inputs.get('vacancy_pct', 0.0))
+                )
+
+                if existing_property:
+                    set_clause_parts = [f"{col} = %s" for col in columns.split(', ') if col.strip() != 'property_address']
+                    set_clause = ", ".join(set_clause_parts)
+                    update_values = values_tuple[1:] + (property_address,)
+                    cursor.execute(f"""
+                        UPDATE properties SET {set_clause}, saved_at = CURRENT_TIMESTAMP
+                        WHERE property_address = %s
+                    """, update_values)
+                    message = f"Property '{property_address}' updated successfully!"
+                else:
+                    placeholders = ", ".join(["%s"] * len(values_tuple))
+                    cursor.execute(f"""
+                        INSERT INTO properties ({columns}) VALUES ({placeholders})
+                    """, values_tuple)
+                    message = f"Property '{property_address}' saved successfully!"
+                db.commit()
 
             except ValueError as ve:
                 error = f"Error saving: Invalid numeric input. {ve}"
