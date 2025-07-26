@@ -128,6 +128,7 @@ def brrrr_calculator_page():
     message = None
     results_calculated = False 
 
+    # Correctly define form_data_for_template for the Full calculator here
     form_data_for_template = {
         "property_address": "", "purchase_price": "", "rehab_cost": "",
         "closing_costs_1": "", "arv": "", "down_payment_1_pct": "",
@@ -219,7 +220,7 @@ def brrrr_calculator_page():
                         INSERT INTO properties ({columns}) VALUES ({placeholders})
                     """, values_tuple)
                     message = f"Property '{property_address}' saved successfully!"
-                    db.commit()
+                db.commit()
 
             except ValueError as ve:
                 error = f"Error saving: Invalid numeric input. {ve}"
@@ -230,18 +231,21 @@ def brrrr_calculator_page():
                 cursor.close()
                 # db.close() # Teardown context handles this
 
-    for key, value in default_inputs.items():
-        if not isinstance(value, str) and value is not None:
-            default_inputs[key] = str(value)
+    # This section is ONLY for the Quick Defaults calculator.
+    # It should NOT be in the brrrr_calculator_page (Full calculator).
+    # We need to remove this loop from here.
+    # for key, value in default_inputs.items():
+    #     if not isinstance(value, str) and value is not None:
+    #         default_inputs[key] = str(value)
 
     return render_template(
         'brrrr_calculator.html',
-        page_title="BRRRR Investment Calculator (Quick Defaults)",
+        page_title="BRRRR Investment Calculator (Full)",
         error=error,
         message=message,
         results_calculated=results_calculated,
-        hide_default_inputs=True,
-        **default_inputs,
+        hide_default_inputs=False,
+        **form_data_for_template,
         **calculated_outputs
     )
 
@@ -349,7 +353,7 @@ def brrrr_calculator_quick_page():
                 cursor.close()
                 # db.close() # Teardown context handles this
 
-    for key, value in default_inputs.items():
+    for key, value in default_inputs.items(): # This loop is correctly placed for default_inputs here
         if not isinstance(value, str) and value is not None:
             default_inputs[key] = str(value)
 
