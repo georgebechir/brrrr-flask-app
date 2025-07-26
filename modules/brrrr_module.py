@@ -231,12 +231,9 @@ def brrrr_calculator_page():
                 cursor.close()
                 # db.close() # Teardown context handles this
 
-    # This section is ONLY for the Quick Defaults calculator.
-    # It should NOT be in the brrrr_calculator_page (Full calculator).
-    # We need to remove this loop from here.
-    # for key, value in default_inputs.items():
-    #     if not isinstance(value, str) and value is not None:
-    #         default_inputs[key] = str(value)
+    for key, value in form_data_for_template.items(): # Corrected: default_inputs -> form_data_for_template
+        if not isinstance(value, str) and value is not None:
+            form_data_for_template[key] = str(value)
 
     return render_template(
         'brrrr_calculator.html',
