@@ -1,10 +1,12 @@
-
 # app.py
-from flask import Flask, render_template, g
+from flask import Flask, render_template, g, current_app
 import os
 import psycopg2 # For PostgreSQL
 from psycopg2 import extras # For dictionary-like rows
+import logging # For better logging of errors
 
+# Configure logging
+logging.basicConfig(level=logging.INFO)
 app = Flask(__name__)
 
 # --- Database Configuration for PostgreSQL ---
@@ -14,14 +16,24 @@ DATABASE_URL = os.environ.get('DATABASE_URL')
 def get_db():
     """
     Establishes a PostgreSQL database connection or returns the existing one.
+    Uses Flask's g object to store the connection for the duration of the request.
     """
     db = getattr(g, '_database', None)
     if db is None:
         if not DATABASE_URL:
+            current_app.logger.error("DATABASE_URL environment variable is not set.")
             raise ValueError("DATABASE_URL environment variable is not set.")
-        db = g._database = psycopg2.connect(DATABASE_URL)
-        # Use RealDictCursor to get dictionary-like rows for easy column access
-        db.cursor_factory = psycopg2.extras.RealDictCursor
+        try:
+            # Attempt to connect to the database
+            conn = psycopg2.connect(DATABASE_URL)
+            # Set cursor factory for dictionary-like rows
+            conn.cursor_factory = psycopg2.extras.RealDictCursor
+            db = g._database = conn
+            current_app.logger.info("Successfully connected to the database.")
+        except Exception as e:
+            current_app.logger.error(f"Failed to connect to database: {e}")
+            # Re-raise the exception to make the error visible in the application
+            raise
     return db
 
 @app.teardown_appcontext
@@ -31,7 +43,11 @@ def close_connection(exception):
     """
     db = getattr(g, '_database', None)
     if db is not None:
-        db.close()
+        # Check if the connection is actually open before trying to close it
+        if not db.closed:
+            db.close()
+            current_app.logger.info("Database connection closed.")
+
 
 def init_db():
     """
@@ -41,15 +57,11 @@ def init_db():
     with app.app_context():
         db = get_db()
         with app.open_resource('schema.sql', mode='r') as f:
-            # For PostgreSQL, execute() is typically used for a single statement or script
-            # executescript() is SQLite specific. For complex SQL, it's better to
-            # execute line by line or ensure schema.sql is one valid command.
-            # Assuming schema.sql is simple DDL for now.
             cursor = db.cursor()
             cursor.execute(f.read())
             db.commit()
             cursor.close()
-    print("Database initialized/updated successfully.")
+    app.logger.info("Database initialized/updated successfully.")
 
 # --- Register Blueprints (Modularized App Sections) ---
 # Import blueprints from their respective modules
