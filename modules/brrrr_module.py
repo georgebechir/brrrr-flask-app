@@ -231,9 +231,7 @@ def brrrr_calculator_page():
                 cursor.close()
                 # db.close() # Teardown context handles this
 
-    for key, value in form_data_for_template.items(): # Corrected: default_inputs -> form_data_for_template
-        if not isinstance(value, str) and value is not None:
-            form_data_for_template[key] = str(value)
+    # Removed the problematic default_inputs loop from here
 
     return render_template(
         'brrrr_calculator.html',

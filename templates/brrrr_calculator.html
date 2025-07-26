@@ -83,50 +83,34 @@
             <label for="rehab_cost">Rehab Cost ($):</label>
             <input type="number" id="rehab_cost" name="rehab_cost" value="{{ rehab_cost }}" required step="0.01">
 
-            {% if hide_default_inputs %}
-                <input type="hidden" name="closing_costs_1" value="{{ closing_costs_1 }}">
-            {% else %}
-                <label for="closing_costs_1">Closing Costs (Loan 1 / Acquisition) ($):</label>
-                <input type="number" id="closing_costs_1" name="closing_costs_1" value="{{ closing_costs_1 }}" required step="0.01">
-            {% endif %}
+            <label for="closing_costs_1">Closing Costs (Loan 1 / Acquisition) ($):</label>
+            <input type="number" id="closing_costs_1" name="closing_costs_1" value="{{ closing_costs_1 }}" required step="0.01">
 
             <label for="arv">After Repair Value (ARV) ($):</label>
             <input type="number" id="arv" name="arv" value="{{ arv }}" required step="0.01">
 
             <h3 class="section-title">Hard Money Loan (Loan 1) Details</h3>
-            {% if hide_default_inputs %}
-                <input type="hidden" name="down_payment_1_pct" value="{{ down_payment_1_pct }}">
-                <input type="hidden" name="interest_rate_1" value="{{ interest_rate_1 }}">
-            {% else %}
-                <label for="down_payment_1_pct">Down Payment (Loan 1 / % of Purchase Price):</label>
-                <input type="number" id="down_payment_1_pct" name="down_payment_1_pct" value="{{ down_payment_1_pct }}" required step="0.01" min="0" max="100">
+            <label for="down_payment_1_pct">Down Payment (Loan 1 / % of Purchase Price):</label>
+            <input type="number" id="down_payment_1_pct" name="down_payment_1_pct" value="{{ down_payment_1_pct }}" required step="0.01" min="0" max="100">
 
-                <label for="interest_rate_1">Interest Rate (Loan 1 / %):</label>
-                <input type="number" id="interest_rate_1" name="interest_rate_1" value="{{ interest_rate_1 }}" required step="0.001" min="0">
-            {% endif %}
+            <label for="interest_rate_1">Interest Rate (Loan 1 / %):</label>
+            <input type="number" id="interest_rate_1" name="interest_rate_1" value="{{ interest_rate_1 }}" required step="0.001" min="0">
 
             <label for="rehab_period_months">Rehab Period Length (Months):</label>
             <input type="number" id="rehab_period_months" name="rehab_period_months" value="{{ rehab_period_months }}" required min="0">
 
             <h3 class="section-title">Refinance Loan (Loan 2) Details</h3>
-            {% if hide_default_inputs %}
-                <input type="hidden" name="refinance_pct" value="{{ refinance_pct }}">
-                <input type="hidden" name="interest_rate_2" value="{{ interest_rate_2 }}">
-                <input type="hidden" name="loan_term_years" value="{{ loan_term_years }}">
-                <input type="hidden" name="closing_costs_2" value="{{ closing_costs_2 }}">
-            {% else %}
-                <label for="refinance_pct">Refinance Percentage (Loan 2 / % of ARV - e.g., 75 for 75% LTV):</label>
-                <input type="number" id="refinance_pct" name="refinance_pct" value="{{ refinance_pct }}" required step="0.01" min="0" max="100">
+            <label for="refinance_pct">Refinance Percentage (Loan 2 / % of ARV - e.g., 75 for 75% LTV):</label>
+            <input type="number" id="refinance_pct" name="refinance_pct" value="{{ refinance_pct }}" required step="0.01" min="0" max="100">
 
-                <label for="interest_rate_2">Interest Rate (Loan 2 / %):</label>
-                <input type="number" id="interest_rate_2" name="interest_rate_2" value="{{ interest_rate_2 }}" required step="0.001" min="0">
+            <label for="interest_rate_2">Interest Rate (Loan 2 / %):</label>
+            <input type="number" id="interest_rate_2" name="interest_rate_2" value="{{ interest_rate_2 }}" required step="0.001" min="0">
 
-                <label for="loan_term_years">Loan Term (Loan 2 / Years):</label>
-                <input type="number" id="loan_term_years" name="loan_term_years" value="{{ loan_term_years }}" required min="1">
+            <label for="loan_term_years">Loan Term (Loan 2 / Years):</label>
+            <input type="number" id="loan_term_years" name="loan_term_years" value="{{ loan_term_years }}" required min="1">
 
-                <label for="closing_costs_2">Closing Costs (Loan 2 / Refinance) ($):</label>
-                <input type="number" id="closing_costs_2" name="closing_costs_2" value="{{ closing_costs_2 }}" required step="0.01">
-            {% endif %}
+            <label for="closing_costs_2">Closing Costs (Loan 2 / Refinance) ($):</label>
+            <input type="number" id="closing_costs_2" name="closing_costs_2" value="{{ closing_costs_2 }}" required step="0.01">
 
             <h3 class="section-title">Monthly Operating Expenses (Post-Rehab)</h3>
             <label for="rent_estimate">Estimated Monthly Rent ($):</label>
@@ -135,24 +119,17 @@
             <label for="property_tax">Annual Property Tax ($):</label>
             <input type="number" id="property_tax" name="property_tax" value="{{ property_tax }}" required step="0.01">
 
-            {% if hide_default_inputs %}
-                <input type="hidden" name="insurance" value="{{ insurance }}">
-                <input type="hidden" name="property_management_pct" value="{{ property_management_pct }}">
-                <input type="hidden" name="maintenance_pct" value="{{ maintenance_pct }}">
-                <input type="hidden" name="vacancy_pct" value="{{ vacancy_pct }}">
-            {% else %}
-                <label for="insurance">Annual Insurance ($):</label>
-                <input type="number" id="insurance" name="insurance" value="{{ insurance }}" required step="0.01">
+            <label for="insurance">Annual Insurance ($):</label>
+            <input type="number" id="insurance" name="insurance" value="{{ insurance }}" required step="0.01">
 
-                <label for="property_management_pct">Property Management (% of Gross Rent):</label>
-                <input type="number" id="property_management_pct" name="property_management_pct" value="{{ property_management_pct }}" required step="0.01" min="0" max="100">
+            <label for="property_management_pct">Property Management (% of Gross Rent):</label>
+            <input type="number" id="property_management_pct" name="property_management_pct" value="{{ property_management_pct }}" required step="0.01" min="0" max="100">
 
-                <label for="maintenance_pct">Maintenance (% of Gross Rent):</label>
-                <input type="number" id="maintenance_pct" name="maintenance_pct" value="{{ maintenance_pct }}" required step="0.01" min="0" max="100">
+            <label for="maintenance_pct">Maintenance (% of Gross Rent):</label>
+            <input type="number" id="maintenance_pct" name="maintenance_pct" value="{{ maintenance_pct }}" required step="0.01" min="0" max="100">
 
-                <label for="vacancy_pct">Vacancy (% of Gross Rent):</label>
-                <input type="number" id="vacancy_pct" name="vacancy_pct" value="{{ vacancy_pct }}" required step="0.01" min="0" max="100">
-            {% endif %}
+            <label for="vacancy_pct">Vacancy (% of Gross Rent):</label>
+            <input type="number" id="vacancy_pct" name="vacancy_pct" value="{{ vacancy_pct }}" required step="0.01" min="0" max="100">
 
             <input type="submit" value="Calculate BRRRR">
         </form>
